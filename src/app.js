@@ -6,8 +6,14 @@ const routerTransaction = require("./routers/transaction.routes");
 
 app.use("/auth", routerAuth);
 app.use("/transaction", routerTransaction);
-app.use("*", (req, res) => {
-  res.status(200).json({ massage: "Страница 404 и тестовые запросы к серверу" });
+
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+app.use((err, req, res, next) => {
+  const { status = 500, message = "Server error" } = err;
+  res.status(status).json({ message });
 });
 
 module.exports = app;
