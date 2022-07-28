@@ -6,12 +6,10 @@ const idGeneration = require("nanoid");
 const dotenv = require("dotenv");
 dotenv.config();
 const { PASSWORD_KEY } = process.env;
-const PORT = process.env.PORT;
 
 class User {
   async addNewUser(req, res, next) {
     const { email, password } = req.body;
-    const avatarRandom = gravatar.url(email);
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
       if (duplicateEmail) {
@@ -24,16 +22,15 @@ class User {
       const user = new UserModel({
         email: email,
         password: hashPassword,
-        avatarURL: avatarRandom,
         verificationToken: verificationToken,
       });
       await user.save();
-      const massageVerify = {
-        to: email,
-        subject: "Подтвердите ваш emeil для регистрации на нашем сервере",
-        html: `<a target='_blank' href='${PORT}/api/auth/verify/${verificationToken}'>Нажмите для подтверждения регистрации на нашем сайте: ${PORT}</a>`,
-      };
-      await sendEmail(massageVerify);
+      //   const massageVerify = {
+      //     to: email,
+      //     subject: "Подтвердите ваш emeil для регистрации на нашем сервере",
+      //     html: `<a target='_blank' href='${PORT}/api/auth/verify/${verificationToken}'>Нажмите для подтверждения регистрации на нашем сайте: ${PORT}</a>`,
+      //   };
+      // await sendEmail(massageVerify);
       return res.status(200).json({ message: "Verification send to email", response: user });
     } catch (error) {
       return res
@@ -110,6 +107,7 @@ class User {
       //     { verify: true, token: token },
       //     { new: true }
       //   );
+      const userVerification = {};
       return res.status(200).json({ message: "Verification success", response: userVerification });
     } catch (error) {
       return res.status(404).json({ message: `User not found`, response: null, error: error });
@@ -134,6 +132,7 @@ class User {
       //     html: `<a target='_blank' href='${PORT}/api/auth/verify/${user.verificationToken}'>Нажмите для подтверждения регистрации на нашем сайте: ${PORT}</a>`,
       //   };
       //   await sendEmail(massageVerify);
+      const massageVerify = {};
       return res
         .status(200)
         .json({ message: "Verification send to email", response: massageVerify });

@@ -3,8 +3,8 @@ const TransactionModel = require("../models/transaction");
 class Transaction {
   async getAllTransaction(req, res, next) {
     try {
-      await TransactionModel.find({});
-      return res.status(200).json({ message: "status 200", response: allContacts });
+      const allTransaction = await TransactionModel.find({});
+      return res.status(200).json({ message: "status 200", response: allTransaction });
     } catch (error) {
       return res
         .status(404)
@@ -14,13 +14,14 @@ class Transaction {
 
   async addNewTransaction(req, res, next) {
     try {
-      const transaction = new TransactionModel({
-        email: email,
-        password: hashPassword,
-        avatarURL: avatarRandom,
-        verificationToken: verificationToken,
-      });
-      return res.status(200).json({ message: "status 201", response: newContact });
+      //   const transaction = new TransactionModel({
+      //     email: email,
+      //     password: hashPassword,
+      //     avatarURL: avatarRandom,
+      //     verificationToken: verificationToken,
+      //   });
+      const newTransaction = {};
+      return res.status(200).json({ message: "status 201", response: newTransaction });
     } catch (error) {
       return res.status(404).json({
         message: "Transaction not created, i am sorry try again",
