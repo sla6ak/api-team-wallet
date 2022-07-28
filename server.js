@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const app = require("./srs/app");
+const app = require("./src/app");
 
 // Вытягиваем переменные окружения в которой прячем путь к базе данных
 dotenv.config();

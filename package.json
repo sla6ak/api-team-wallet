@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node app",
     "dev": "cross-env NODE_ENV=development nodemon app",
-    "lint": "eslint **/*.js",
+    "lint": "eslint src/**/*.js",
     "lint:fix": "eslint --fix **/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
