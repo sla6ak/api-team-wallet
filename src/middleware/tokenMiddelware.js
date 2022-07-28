@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const dotenv = require("dotenv");
 dotenv.config();
-const { PASSWORD_KEY } = process.env;
+const { JWT_SECRET_KEY } = process.env;
 
 const tokenMiddelware = (req, res, next) => {
   if (req.method === "OPTIONS") {
@@ -13,16 +13,23 @@ const tokenMiddelware = (req, res, next) => {
     if (!token) {
       return res
         .status(401)
-        .json({ message: "Your token is no validate, login please", response: null });
+        .json({
+          message: "Your token is no validate, login please",
+          response: null,
+        });
     }
-    const tokenDecoder = jwt.verify(token, PASSWORD_KEY); // что шифровали то и вытянем
+    const tokenDecoder = jwt.verify(token, JWT_SECRET_KEY); // что шифровали то и вытянем
     req.userId = tokenDecoder.id;
     req.token = token;
     next();
   } catch (error) {
     return res
       .status(401)
-      .json({ message: "Your token is no validate, login please", response: null, error: error });
+      .json({
+        message: "Your token is no validate, login please",
+        response: null,
+        error: error,
+      });
   }
 };
 
