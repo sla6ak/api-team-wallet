@@ -1,22 +1,22 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const app = require("./src/app");
 
-// Вытягиваем переменные окружения в которой прячем путь к базе данных
-dotenv.config();
-const { MONGO_DB } = process.env;
-const PORT = process.env.PORT || 5000; // http://localhost:5000/docs
+const { DB_HOST, PORT = 5000 } = process.env;
 
 async function start() {
   try {
     app.listen(PORT, () => {
-      console.log(`listening ${PORT}`);
-      mongoose.connect(MONGO_DB).then(() => {
-        console.log(`MongoDB start`);
+      console.log(`Use port ${PORT}`);
+      mongoose.connect(DB_HOST).then(() => {
+        console.log(`MongoDB connection successful`);
       });
     });
   } catch (error) {
-    process.exit(0);
+    console.log(error.massage);
+    process.exit(1);
+    //Параметр 0 для process.exit() не використовується.
+    //Код 0 означає успішне виконання операції, а ми в даному випадку відпрацьовуємо помилку.
   }
 }
 
