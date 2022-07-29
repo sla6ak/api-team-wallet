@@ -2,6 +2,7 @@
   "name": "api-team-wallet",
   "version": "1.0.0",
   "description": "",
+  "stack": "heroku-22",
   "main": "server.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node server",
@@ -14,14 +15,16 @@
     "type": "git",
     "url": "git+https://github.com/sla6ak/api-team-wallet.git"
   },
-  "author": "team project [viktor, dmitriy, vira, miha, vadim, polina, andry]",
+  "author": "team project [viktor, volodymyr, dmitriy, vira, miha, vadim, polina, andry]",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/sla6ak/api-team-wallet/issues"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
+    "bson-objectid": "^2.0.3",
     "cors": "2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
@@ -29,7 +32,6 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.4",
-    "nanoid": "^3.3.4",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
