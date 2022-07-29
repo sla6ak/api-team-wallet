@@ -2,7 +2,7 @@ const UserModel = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const idGeneration = require("bson-objectid");
-const { createError, sendMail } = require("../helpers");
+const { createError, sendMail, sgMailData } = require("../helpers");
 
 const dotenv = require("dotenv");
 dotenv.config();
