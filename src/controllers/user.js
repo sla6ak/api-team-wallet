@@ -19,7 +19,7 @@ class User {
 
       const hashPassword = await bcrypt.hash(password, 12);
       const verificationToken = idGeneration();
-      //await sendMail(sgMailData(verificationToken, email), next);
+      await sendMail(sgMailData(verificationToken, email), next);
 
       const user = await User.create({
         ...req.body,
