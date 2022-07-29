@@ -1,9 +1,9 @@
 const router = require("express").Router();
-const { tokenMiddelware } = require("../middleware/tokenMiddelware");
+const { tokenMiddleware } = require("../middleware/tokenMiddleware");
 const transaction = require("../controllers/transaction");
 
-router.get("/transaction", tokenMiddelware, transaction.getAllTransaction);
+router.get("/transaction", tokenMiddleware, transaction.getAllTransaction);
 
-router.post("/transaction", tokenMiddelware, transaction.addNewTransaction);
+router.post("/transaction", tokenMiddleware, transaction.addNewTransaction);
 
 module.exports = router;
