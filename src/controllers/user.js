@@ -1,8 +1,9 @@
 const UserModel = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const idGeneration = require("bson-objectid");
-const { createError, sendMail, sgMailData } = require("../helpers");
+const { createError, defaultResponseData } = require("../helpers");
+// const idGeneration = require("bson-objectid");
+// const { sendMail, sgMailData } = require("../helpers");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -18,18 +19,17 @@ class User {
       }
 
       const hashPassword = await bcrypt.hash(password, 12);
-      const verificationToken = idGeneration();
-      await sendMail(sgMailData(verificationToken, email), next);
+      // const verificationToken = idGeneration();
+      // await sendMail(sgMailData(token, email), next);
 
-      const user = await User.create({
+      const user = await UserModel.create({
         ...req.body,
         password: hashPassword,
-        verificationToken,
+        // verificationToken,
       });
 
-      return res
-        .status(200)
-        .json({ message: "Verification send to email", response: user });
+      const data = { ...defaultResponseData(), user };
+      res.json(data);
     } catch (error) {
       next(error);
     }
@@ -38,34 +38,30 @@ class User {
   async userLogin(req, res, next) {
     try {
       const { email, password } = req.body;
-      const user = await UserModel.findOne({ email: email });
-      if (!user) {
-        return res
-          .status(400)
-          .json({ message: `User ${email} not found`, response: null });
+      const findResult = await UserModel.findOne({ email: email });
+
+      if (!findResult) {
+        throw createError(401, `Email or password is wrong`);
       }
-      if (!user.verify) {
-        return res
-          .status(400)
-          .json({ message: `User ${email} not verify`, response: null });
-      }
-      const isPassword = await bcrypt.compare(password, user.password);
+
+      // if (!findResult.verify) {
+      //  throw createError(401, `User ${email} not verify`);
+      // }
+
+      const isPassword = await bcrypt.compare(password, findResult.password);
+
       if (!isPassword) {
-        return res
-          .status(400)
-          .json({ message: `User ${email} not found`, response: null });
+        throw createError(401, `Email or password is wrong`);
       }
-      const token = jwt.sign({ id: user._id }, JWT_SECRET_KEY, {
+
+      const token = jwt.sign({ id: findResult._id }, JWT_SECRET_KEY, {
         expiresIn: "30d",
       });
-      const loginSuccessful = await UserModel.findOneAndUpdate(
-        { email: email },
-        { token: token },
-        { new: true }
-      );
-      return res
-        .status(200)
-        .json({ message: "status 200", response: loginSuccessful });
+
+      const user = await UserModel.findByIdAndUpdate(findResult._id, { token });
+
+      const data = { ...defaultResponseData(), user };
+      return res.json(data);
     } catch (error) {
       next(error);
     }
@@ -73,13 +69,13 @@ class User {
 
   async getCurrentUser(req, res, next) {
     try {
-      const user = await UserModel.findById({ _id: req.userId });
+      const { email } = req.user;
+      const user = await UserModel.findOne({ email });
       if (!user) {
-        return res
-          .status(404)
-          .json({ message: `User not found`, response: null });
+        throw createError(404);
       }
-      return res.status(200).json({ message: "status 200", response: user });
+      const data = { ...defaultResponseData(), user };
+      return res.json(data);
     } catch (error) {
       next(error);
     }
@@ -93,11 +89,10 @@ class User {
         { new: true }
       );
       if (!user) {
-        return res
-          .status(404)
-          .json({ message: `User not found`, response: null });
+        throw createError(404);
       }
-      return res.status(200).json({ message: "status 200", response: user });
+      const data = { ...defaultResponseData(), user };
+      return res.json(data);
     } catch (error) {
       next(error);
     }
