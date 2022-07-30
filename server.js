@@ -15,8 +15,6 @@ async function start() {
   } catch (error) {
     console.log(error.massage);
     process.exit(1);
-    //Параметр 0 для process.exit() не використовується.
-    //Код 0 означає успішне виконання операції, а ми в даному випадку відпрацьовуємо помилку.
   }
 }
 
