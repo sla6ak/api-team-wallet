@@ -7,6 +7,7 @@ const defaultResponseData = (status = 200, message = statusCode[status]) => {
       email: null,
       _id: null,
       token: null,
+      currentBalance: null,
     },
 
     transaction: {
@@ -15,7 +16,7 @@ const defaultResponseData = (status = 200, message = statusCode[status]) => {
       sum: null,
       _id: null,
       owner: null,
-      currentBalance: null,
+      balanceAfterTransaction: null,
     },
 
     status,
