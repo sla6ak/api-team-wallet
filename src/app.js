@@ -1,6 +1,5 @@
 const app = require("./config/serverConfig");
 
-// Ниже импорты разных рероутов
 const routerAuth = require("./routers/auth.routes");
 const routerTransaction = require("./routers/transaction.routes");
 
