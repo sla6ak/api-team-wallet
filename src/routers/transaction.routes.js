@@ -1,9 +1,17 @@
 const router = require("express").Router();
-const { tokenMiddleware } = require("../middleware/tokenMiddleware");
+const { authenticate } = require("../middleware");
+// const { isValidId } = require("../middleware");
 const transaction = require("../controllers/transaction");
 
-router.get("/transaction", tokenMiddleware, transaction.getAllTransaction);
+router.get("/transaction", authenticate, transaction.getAllTransaction);
 
-router.post("/transaction", tokenMiddleware, transaction.addNewTransaction);
+// router.get(
+//  "/transaction/:id",
+//  authenticate,
+//  isValidId,
+//  transaction.getTransactionById
+// );
+
+router.post("/transaction", authenticate, transaction.addNewTransaction);
 
 module.exports = router;

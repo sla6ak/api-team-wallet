@@ -1,34 +1,25 @@
 const jwt = require("jsonwebtoken");
-
-const dotenv = require("dotenv");
-dotenv.config();
+const { createError } = require("../helpers");
 const { JWT_SECRET_KEY } = process.env;
 
 const tokenMiddleware = (req, res, next) => {
   if (req.method === "OPTIONS") {
     next();
   }
+
   try {
-    const token = req.headers.authorization.split(" ")[1]; // "Bearer TOKEN" это строка поэтому распарсим ее в массив на 2 слова - и вытянем елемент 1
+    const token = req.headers.authorization.split(" ")[1];
     if (!token) {
-      return res.status(401).json({
-        message: "Your token is no validate, login please",
-        response: null,
-      });
+      throw createError(401, "Your token is no validate, login please");
     }
-    const tokenDecoder = jwt.verify(token, JWT_SECRET_KEY); // что шифровали то и вытянем
+
+    const tokenDecoder = jwt.verify(token, JWT_SECRET_KEY);
     req.userId = tokenDecoder.id;
     req.token = token;
     next();
   } catch (error) {
-    return res.status(401).json({
-      message: "Your token is no validate, login please",
-      response: null,
-      error: error,
-    });
+    next(error);
   }
 };
 
-module.exports = {
-  tokenMiddleware,
-};
+module.exports = tokenMiddleware;
