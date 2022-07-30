@@ -12,22 +12,41 @@ class Transaction {
     }
   }
 
+  // Проверить что все поля обязательные заполнены - тип, категория, сумма, дата
   async addNewTransaction(req, res, next) {
     try {
-      //   const transaction = new TransactionModel({
-      //     email: email,
-      //     password: hashPassword,
-      //     avatarURL: avatarRandom,
-      //     verificationToken: verificationToken,
-      //   });
-      const newTransaction = {};
-      return res.status(200).json({ message: "status 201", response: newTransaction });
+      // мидлвара аутентификации вкладывает юзера в объект req
+      const { user } = req.user;
+      const { type, sum } = req.body;
+
+      // берем текущий баланс у юзера
+      const previousCurrentBalance = user.currentBalance;
+
+      // высчитываем новый баланс
+      const currentBalance = () => {
+        return type === 'income'
+          ? (previousCurrentBalance + sum)
+          : (previousCurrentBalance - sum)
+      }
+
+      // переписать у юзера текущий баланс
+
+      // проверить есть ли другие транзакции после даты текущей транзакции
+
+      // ответ
+      const transaction = {
+        user,
+        transaction: {
+          ...req.body, // тип, категория, дата, сумма транзакции, комментарий
+          currentBalance, // баланс после текущей транзакции транзакции
+          owner: user._id,
+        }
+      }
+      return res
+        .status(201)
+        .json({ message: "Transaction was created successfully", response: transaction });
     } catch (error) {
-      return res.status(404).json({
-        message: "Transaction not created, i am sorry try again",
-        response: null,
-        error: error,
-      });
+      next(error);
     }
   }
 }
