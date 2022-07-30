@@ -38,29 +38,30 @@ class User {
   async userLogin(req, res, next) {
     try {
       const { email, password } = req.body;
-      const findResult = await UserModel.findOne({ email: email });
+      const user = await UserModel.findOne({ email });
 
-      if (!findResult) {
+      if (!user) {
         throw createError(401, `Email or password is wrong`);
       }
 
-      // if (!findResult.verify) {
+      // if (!user.verify) {
       //  throw createError(401, `User ${email} not verify`);
       // }
 
-      const isPassword = await bcrypt.compare(password, findResult.password);
+      const isPassword = await bcrypt.compare(password, user.password);
 
       if (!isPassword) {
         throw createError(401, `Email or password is wrong`);
       }
 
-      const token = jwt.sign({ id: findResult._id }, JWT_SECRET_KEY, {
+      const token = jwt.sign({ id: user._id }, JWT_SECRET_KEY, {
         expiresIn: "30d",
       });
 
-      const user = await UserModel.findByIdAndUpdate(findResult._id, { token });
+      const result = await UserModel.findByIdAndUpdate(user._id, { token });
+      console.log(result);
 
-      const data = { ...defaultResponseData(), user };
+      const data = { ...defaultResponseData(), user, token };
       return res.json(data);
     } catch (error) {
       next(error);
@@ -83,16 +84,12 @@ class User {
 
   async logOutUser(req, res, next) {
     try {
-      const user = await UserModel.findByIdAndUpdate(
-        { _id: req.userId },
-        { token: "" },
-        { new: true }
-      );
+      const { _id } = req.user;
+      const user = await UserModel.findByIdAndUpdate(_id, { token: "" });
       if (!user) {
         throw createError(404);
       }
-      const data = { ...defaultResponseData(), user };
-      return res.json(data);
+      return res.status(204);
     } catch (error) {
       next(error);
     }
