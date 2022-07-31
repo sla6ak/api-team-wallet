@@ -6,30 +6,41 @@ const schema = new Schema(
       type: String,
       required: [true, "Name is required"],
     },
+
     email: {
       type: String,
       required: [true, "Email is required"],
       unique: true,
     },
+
     password: {
       type: String,
       required: [true, "Password is required"],
     },
+
+    currentBalance: {
+      type: Number,
+      default: 0,
+    },
+
     token: {
       type: String,
-      required: [true, "Verify token is required"],
+      default: "",
     },
+
+    requireVerificationEmail: {
+      type: Boolean,
+      default: false,
+    },
+
     verify: {
       type: Boolean,
       default: false,
     },
+
     verificationToken: {
       type: String,
       default: "",
-    },
-    currentBalance: {
-      type: Number,
-      default: 0,
     },
   },
   {
