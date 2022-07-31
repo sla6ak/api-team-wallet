@@ -1,6 +1,7 @@
 const app = require("./config/serverConfig");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger.json");
+
 const routerAuth = require("./routers/auth.routes");
 const routerTransaction = require("./routers/transaction.routes");
 

@@ -1,24 +1,52 @@
 const { Schema, model } = require("mongoose");
 
-const schema = new Schema({
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-  },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-  },
-  verify: {
-    type: Boolean,
-    default: false,
-  },
-  verificationToken: {
-    type: String,
-    required: [true, "Verify token is required"],
-  },
-  name: { type: String, required: [true, "Name is required"] },
-});
+const schema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+    },
 
-module.exports = model("user", schema); // именует модель которая будет созданна при запросе к базе
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+    },
+
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+
+    currentBalance: {
+      type: Number,
+      default: 0,
+    },
+
+    token: {
+      type: String,
+      default: "",
+    },
+
+    requireVerificationEmail: {
+      type: Boolean,
+      default: false,
+    },
+
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+
+    verificationToken: {
+      type: String,
+      default: "",
+    },
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  }
+);
+
+module.exports = model("user", schema);
