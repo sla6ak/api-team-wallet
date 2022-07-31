@@ -1,4 +1,5 @@
 const TransactionModel = require("../models/transaction");
+// const UserModel = require("../models/user");
 
 class Transaction {
   async getAllTransaction(req, res, next) {
@@ -30,21 +31,24 @@ class Transaction {
       }
 
       // переписать у юзера текущий баланс
+      // const updatedUser = await UserModel.findByIdAndUpdate()
 
       // проверить есть ли другие транзакции после даты текущей транзакции
 
-      // ответ
-      const transaction = {
-        user,
-        transaction: {
-          ...req.body, // тип, категория, дата, сумма транзакции, комментарий
-          currentBalance, // баланс после текущей транзакции транзакции
-          owner: user._id,
-        }
-      }
+      // создать новую транзакцию в базе
+      const newTransaction = await TransactionModel.create({
+        ...req.body, // тип, категория, дата, сумма транзакции, комментарий
+        currentBalance, // баланс после текущей транзакции транзакции
+        owner: user._id,
+      });
+
       return res
         .status(201)
-        .json({ message: "Transaction was created successfully", response: transaction });
+        .json({
+          message: "Transaction was created successfully", response: {
+            user,
+            newTransaction,
+        } });
     } catch (error) {
       next(error);
     }
