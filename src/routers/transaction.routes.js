@@ -3,7 +3,7 @@ const { authenticate } = require("../middleware");
 // const { isValidId } = require("../middleware");
 const transaction = require("../controllers/transaction");
 
-router.get("/transaction", authenticate, transaction.getAllTransaction);
+router.get("/all", authenticate, transaction.getAllTransaction);
 
 // router.get(
 //  "/transaction/:id",
@@ -12,6 +12,7 @@ router.get("/transaction", authenticate, transaction.getAllTransaction);
 //  transaction.getTransactionById
 // );
 
-router.post("/transaction", authenticate, transaction.addNewTransaction);
+// router.post("/transaction", authenticate, transaction.addNewTransaction);
+router.post("/add", transaction.addNewTransaction);
 
 module.exports = router;

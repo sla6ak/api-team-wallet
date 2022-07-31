@@ -8,10 +8,11 @@ const transactionSchema = new Schema({
   },
   category: {
     type: String,
-    enum: ["Main", "Food", "Auto", "Children", "House", "Education"], // Решить какие будут категории
+    // TODO: Решить какие будут категории
+    enum: ["Main", "Food", "Auto", "Children", "House", "Education"],
     required: [true, "Transaction category is required"],
   },
-  currentBalance: { 
+  balanceAfterTransaction: { 
     type: Number, 
   }, 
   sum: {

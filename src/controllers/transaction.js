@@ -1,54 +1,75 @@
 const TransactionModel = require("../models/transaction");
 // const UserModel = require("../models/user");
+// const { defaultResponseData } = require("../helpers");
 
 class Transaction {
   async getAllTransaction(req, res, next) {
     try {
-      const allTransaction = await TransactionModel.find({});
-      return res.status(200).json({ message: "status 200", response: allTransaction });
-    } catch (error) {
+      // мидлвара аутентификации вкладывает юзера в объект req
+      const { user } = req.user;
+      console.log('user', user);
+      const owner = user._id;
+
+      // ищем все транзакции принадлежащие текущему юзеру
+      const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
+      console.log(transactions);
+
+      // возвращаем ответ если транзакций нет
+      if (!transactions) {
+        // const data = { ...defaultResponseData(), user };
+        // res.json(data);
+      }
+
+      // возвращаем ответ если транзакции есть
       return res
-        .status(404)
-        .json({ message: `Transaction not found`, response: null, error: error });
+        .status(200)
+        .json({
+          response: {
+            user,
+            transactions
+          }
+        });
+    } catch (error) {
+      next(error);
     }
   }
 
-  // Проверить что все поля обязательные заполнены - тип, категория, сумма, дата
+  // TODO: Joi - Проверить что все поля обязательные заполнены - тип, категория, сумма, дата
   async addNewTransaction(req, res, next) {
     try {
-      // мидлвара аутентификации вкладывает юзера в объект req
-      const { user } = req.user;
+      // const { user } = req.user;
+      // console.log('user', user);
       const { type, sum } = req.body;
 
-      // берем текущий баланс у юзера
-      const previousCurrentBalance = user.currentBalance;
+      // const previousBalance = user.currentBalance;
+      const previousBalance = 240;
 
-      // высчитываем новый баланс
-      const currentBalance = () => {
-        return type === 'income'
-          ? (previousCurrentBalance + sum)
-          : (previousCurrentBalance - sum)
-      }
+      const balanceAfterTransaction =
+        type === 'income'
+          ? previousBalance + sum
+          : previousBalance - sum;
 
-      // переписать у юзера текущий баланс
-      // const updatedUser = await UserModel.findByIdAndUpdate()
+      // const updatedUser = await UserModel.findByIdAndUpdate(user._id, { balanceAfterTransaction });
+      // console.log('updatedUser', updatedUser);
 
-      // проверить есть ли другие транзакции после даты текущей транзакции
+      // TODO: формат даты обсудить
+      // TODO: проверяем есть ли другие транзакции после даты текущей транзакции
 
-      // создать новую транзакцию в базе
       const newTransaction = await TransactionModel.create({
-        ...req.body, // тип, категория, дата, сумма транзакции, комментарий
-        currentBalance, // баланс после текущей транзакции транзакции
-        owner: user._id,
+        ...req.body,
+        balanceAfterTransaction,
+        // owner: user._id,
       });
 
-      return res
-        .status(201)
-        .json({
-          message: "Transaction was created successfully", response: {
-            user,
-            newTransaction,
-        } });
+      const data = {
+        // ...defaultResponseData(),
+        // user,
+        status: "201",
+        message: "Transaction was created successfully",
+        transaction: newTransaction,
+      };
+
+      return res.json(data);
     } catch (error) {
       next(error);
     }
