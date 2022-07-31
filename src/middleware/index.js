@@ -6,6 +6,7 @@ const {
   signupValidation,
   verifyValidation,
 } = require("./userValidation");
+const { newTransactionValidation } = require("./transactionValidation");
 
 module.exports = {
   authenticate,
@@ -14,4 +15,5 @@ module.exports = {
   loginValidation,
   signupValidation,
   verifyValidation,
+  newTransactionValidation
 };
