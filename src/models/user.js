@@ -27,6 +27,10 @@ const schema = new Schema(
       type: String,
       default: "",
     },
+    currentBalance: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     versionKey: false,
