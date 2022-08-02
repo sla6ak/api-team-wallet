@@ -1,9 +1,9 @@
-const { CATEGORIES } = require("../constants/constants");
+const { CATEGORIES_EXPENSE } = require("../constants/constants");
 
 const getStatisticByCategories = (transactions) => {
   const statistic = [];
 
-  CATEGORIES.forEach(async category => {
+  CATEGORIES_EXPENSE.forEach(async category => {
     const result = transactions.filter((transaction) => {
       return transaction.category === category;
     })

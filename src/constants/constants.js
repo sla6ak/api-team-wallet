@@ -2,10 +2,13 @@ const TRANSACTION_TYPES = {
   INCOME: "income",
   EXPENSE: "expense",
 }
-const CATEGORIES = [
-  // фронт должен указывать эту категорию для income сам, по умолчанию
+const CATEGORIES_INCOME = [
   "salary",
-  // остальные категории для expense
+  "gift",
+  "other"
+];
+
+const CATEGORIES_EXPENSE = [
   "food",
   "car",
   "children",
@@ -18,5 +21,6 @@ const CATEGORIES = [
 
 module.exports = {
   TRANSACTION_TYPES,
-  CATEGORIES
+  CATEGORIES_INCOME,
+  CATEGORIES_EXPENSE
 }

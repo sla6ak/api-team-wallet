@@ -1,12 +1,12 @@
 const Joi = require("joi");
 const { createError } = require("../helpers");
-const { CATEGORIES } = require("../constants/constants");
+const { CATEGORIES_INCOME, CATEGORIES_EXPENSE } = require("../constants/constants");
 
 const newTransactionValidation = (req, res, next) => {
   try {
     const schema = Joi.object({
       type: Joi.string().valid("income", "expense").required(),
-      category: Joi.string().valid(...CATEGORIES).required(),
+      category: Joi.string().valid(...CATEGORIES_INCOME, ...CATEGORIES_EXPENSE).required(),
       sum: Joi.number().required(),
       date: Joi.string().required(),
     });

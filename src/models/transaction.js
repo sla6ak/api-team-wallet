@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { CATEGORIES } = require("../constants/constants");
+const { CATEGORIES_INCOME, CATEGORIES_EXPENSE } = require("../constants/constants");
 
 const transactionSchema = new Schema({
   type: {
@@ -9,7 +9,7 @@ const transactionSchema = new Schema({
   },
   category: {
     type: String,
-    enum: CATEGORIES,
+    enum: [...CATEGORIES_INCOME, ...CATEGORIES_EXPENSE],
     required: [true, "Transaction category is required"],
   },
   balanceAfterTransaction: { 
