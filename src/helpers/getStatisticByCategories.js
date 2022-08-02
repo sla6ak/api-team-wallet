@@ -1,9 +1,9 @@
-const { categories } = require("../constants/constants");
+const { CATEGORIES } = require("../constants/constants");
 
 const getStatisticByCategories = (transactions) => {
   const statistic = [];
 
-  categories.map(async category => {
+  CATEGORIES.forEach(async category => {
     const result = transactions.filter((transaction) => {
       return transaction.category === category;
     })
@@ -11,9 +11,9 @@ const getStatisticByCategories = (transactions) => {
     if (result.length === 0) return;
 
     let totalSumByCategory = 0;
-    result.map(element => {
+
+    result.forEach(element => {
       totalSumByCategory += element.sum;
-      return element;
     })
 
     statistic.push({
