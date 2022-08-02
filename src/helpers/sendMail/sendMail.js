@@ -7,8 +7,8 @@ const sgMailData = (verificationToken, emailTo) => {
   const data = {
     to: emailTo,
     from: SENDGRID_FROM_EMAIL,
-    subject: "Подтверждение регистрации на сайте",
-    html: `<a target="_blank" href="http://localhost:${PORT}/api/auth//users/verify/${verificationToken}">Нажмите для подтверждения email</a>`,
+    subject: "Confirmation of registration",
+    html: `<a target="_blank" href="http://localhost:${PORT}/auth/verify/${verificationToken}">Click to verification email</a>`,
   };
   return data;
 };
@@ -16,7 +16,9 @@ const sgMailData = (verificationToken, emailTo) => {
 const sendMail = async (sgMailData, next) => {
   try {
     const mail = { ...sgMailData };
-    await sgMail.send(mail);
+    const send = await sgMail.send(mail);
+    console.log("sendMail");
+    return send;
   } catch (error) {
     next(error);
   }

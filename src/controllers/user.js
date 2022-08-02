@@ -1,9 +1,9 @@
 const UserModel = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { createError, defaultResponseData } = require("../helpers");
-// const idGeneration = require("bson-objectid");
-// const { sendMail, sgMailData } = require("../helpers");
+const { createError } = require("../helpers");
+const idGeneration = require("bson-objectid");
+const { sendMail, sgMailData } = require("../helpers");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -11,7 +11,10 @@ const { JWT_SECRET_KEY } = process.env;
 
 class User {
   async addNewUser(req, res, next) {
-    const { email, password } = req.body;
+    const { email, password, requireVerificationEmail } = req.body;
+
+    console.log(`${email}, ${password}, ${requireVerificationEmail}`);
+
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
       if (duplicateEmail) {
@@ -19,17 +22,20 @@ class User {
       }
 
       const hashPassword = await bcrypt.hash(password, 12);
-      // const verificationToken = idGeneration();
-      // await sendMail(sgMailData(token, email), next);
+
+      const verificationToken = idGeneration();
+      if (requireVerificationEmail) {
+        const send = await sendMail(sgMailData(verificationToken, email), next);
+        console.log(send);
+      }
 
       const user = await UserModel.create({
         ...req.body,
         password: hashPassword,
-        // verificationToken,
+        verificationToken,
       });
 
-      const data = { ...defaultResponseData(), user };
-      res.json(data);
+      res.status(201).json({ user });
     } catch (error) {
       next(error);
     }
@@ -44,9 +50,9 @@ class User {
         throw createError(401, `Email or password is wrong`);
       }
 
-      // if (!user.verify) {
-      //  throw createError(401, `User ${email} not verify`);
-      // }
+      if (user.requireVerificationEmail && !user.verify) {
+        throw createError(401, `User ${email} not verify`);
+      }
 
       const isPassword = await bcrypt.compare(password, user.password);
 
@@ -58,11 +64,10 @@ class User {
         expiresIn: "30d",
       });
 
-      const result = await UserModel.findByIdAndUpdate(user._id, { token });
-      console.log(result);
+      await UserModel.findByIdAndUpdate(user._id, { token });
+      user.token = token;
 
-      const data = { ...defaultResponseData(), user, token };
-      return res.json(data);
+      return res.json({ user });
     } catch (error) {
       next(error);
     }
@@ -75,8 +80,7 @@ class User {
       if (!user) {
         throw createError(404);
       }
-      const data = { ...defaultResponseData(), user };
-      return res.json(data);
+      return res.json({ user });
     } catch (error) {
       next(error);
     }
@@ -89,56 +93,50 @@ class User {
       if (!user) {
         throw createError(404);
       }
-      return res.status(204);
+      return res.status(200).json({ message: "Logout success" });
     } catch (error) {
       next(error);
     }
   }
 
-  async verifyUser(req, res, next) {
+  async verifyEmail(req, res, next) {
     try {
-      //   const user = await UserModel.findOne({ verificationToken: req.params.verificationToken });
-      //   if (!user) {
-      //     return res.status(404).json({ message: `User not found`, response: null });
-      //   }
-      //   const token = jwt.sign({ id: user._id }, PASSWORD_KEY, { expiresIn: "30d" }); // в качестве ключа возьму id пользователя
-      //   const userVerification = await UserModel.findOneAndUpdate(
-      //     { verificationToken: req.params.verificationToken },
-      //     { verify: true, token: token },
-      //     { new: true }
-      //   );
-      const userVerification = {};
-      return res
-        .status(200)
-        .json({ message: "Verification success", response: userVerification });
-    } catch (error) {
-      next(error);
-    }
-  }
+      const verificationToken = req.params;
+      const user = await UserModel.findOne(verificationToken);
+      if (!user) {
+        throw createError(404, "User not found");
+      }
 
-  async doubleVerifyUser(req, res, next) {
-    try {
-      //   const { email } = req.body;
-      //   const user = await UserModel.findOne({ email: email });
-      //   if (!user) {
-      //     return res.status(404).json({ message: `User not found`, response: null });
-      //   }
-      //   if (user.verify) {
-      //     return res
-      //       .status(404)
-      //       .json({ message: `Verification has already been passed`, response: null });
-      //   }
-      //   const massageVerify = {
-      //     to: email,
-      //     subject: "Подтвердите ваш email для регистрации на нашем сервере",
-      //     html: `<a target='_blank' href='${PORT}/api/auth/verify/${user.verificationToken}'>Нажмите для подтверждения регистрации на нашем сайте: ${PORT}</a>`,
-      //   };
-      //   await sendEmail(massageVerify);
-      const massageVerify = {};
-      return res.status(200).json({
-        message: "Verification send to email",
-        response: massageVerify,
+      const result = await UserModel.findByIdAndUpdate(user._id, {
+        verificationToken: null,
+        verify: true,
       });
+
+      if (!result) {
+        throw createError(499, "verificationToken error");
+      }
+
+      res.json({ message: "Verification successful" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendVerifyEmail(req, res, next) {
+    try {
+      const { email } = req.body;
+      const user = await UserModel.findOne(email);
+      if (!user) {
+        throw createError(409, "Email not found");
+      }
+
+      if (user.verify) {
+        throw createError(400, "Verification has already been passed");
+      }
+
+      await sendMail(sgMailData(user.verificationToken, email), next);
+
+      res.json({ message: "Verification email sent" });
     } catch (error) {
       next(error);
     }
