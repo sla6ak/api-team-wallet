@@ -7,11 +7,10 @@ router.post("/add", authenticate, newTransactionValidation, transaction.addNewTr
 router.get("/statistic", authenticate, transaction.getStatistic);
 
 // router.get(
-//  "/transaction/:id",
+//  "/:id",
 //  authenticate,
 //  isValidId,
 //  transaction.getTransactionById
 // );
-
 
 module.exports = router;

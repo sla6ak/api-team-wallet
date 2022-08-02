@@ -7,8 +7,8 @@ const sgMailData = (verificationToken, emailTo) => {
   const data = {
     to: emailTo,
     from: SENDGRID_FROM_EMAIL,
-    subject: "Подтверждение регистрации на сайте",
-    html: `<a target="_blank" href="http://localhost:${PORT}/auth/verify/${verificationToken}">Нажмите для подтверждения email</a>`,
+    subject: "Confirmation of registration",
+    html: `<a target="_blank" href="http://localhost:${PORT}/auth/verify/${verificationToken}">Click to verification email</a>`,
   };
   return data;
 };
