@@ -12,7 +12,6 @@ class Transaction {
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
       const data = {
-        user, // TODO: нужно ли возвращать юзера, еще и со всеми полями?
         transactions,
       }
 
@@ -39,6 +38,8 @@ class Transaction {
           user._id,
           { currentBalance: balanceAfterTransaction },
           { new: true });
+      // TODO: тут скорей всего нужна проверка что юзер обновился
+      console.log(updatedUser); 
 
       // TODO: проверить есть ли другие транзакции после даты текущей транзакции и изменить в них поле balanceAfterTransaction
 
@@ -49,7 +50,6 @@ class Transaction {
       });
 
       const data = {
-        user: updatedUser, // TODO: нужно ли возвращать юзера, еще и со всеми полями?
         message: "Transaction was created successfully",
         transaction: newTransaction,
       };
@@ -104,6 +104,60 @@ class Transaction {
 
     } catch (error) {
       next(error);
+    }
+  }
+
+  async getStatisticByYear(req, res, next) {
+    try {
+      const user = req.user;
+      const owner = user._id;
+      const year = Number(req.params.year)
+
+      const transactions = await TransactionModel.find({
+        owner,
+        // year: { $gte: year, $lte: year } // возвращает все транзакции
+        // year: { $gte: year } // возвращает все транзакции
+        // year: { $lte: year } // возвращает все транзакции
+        year // возвращает все транзакции
+      });
+      console.log('transactions', transactions);
+
+      // const result =  await TransactionModel.aggregate([
+      //   {
+      //     $match: {
+      //       owner,
+      //       year
+      //     },
+      //   },
+      // ]);
+      // console.log(result); // возвращает пустой массив
+
+      // TODO: сначала получить транзакции по дате
+      // TODO: потом собрать статистику как в предыдущем рауте (вынести функцию отдельно для переиспользовани)
+      res.json({
+        year,
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getStatisticByMonth(req, res, next) {
+    try {
+      const { year, month } = req.params;
+
+      // let start = new Date(new Date().getTime() - 0.5 * 60 * 60 * 1000);
+      // const letters = await ChatSchema.find({ clan: "", date: { $gte: start } });
+      // res.status(200).json({ massage: "find lastLetters", letters: letters });
+
+      // TODO: получить транзакции по дате и собрать статистику
+      
+      res.json({
+        year,
+        month
+      })
+    } catch (error) {
+      next(error)
     }
   }
 }
