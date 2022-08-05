@@ -66,27 +66,8 @@ class Transaction {
       const owner = user._id;
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
-      let totalIncomeSum = 0;
-      let totalExpenseSum = 0;
-      let expenseStatistic = [];
-
-      if (transactions.length !== 0) {
-        transactions.forEach(transaction => {
-          if (transaction.type === TRANSACTION_TYPES.INCOME) {
-            totalIncomeSum += transaction.sum;
-          } else {
-            totalExpenseSum += transaction.sum;
-          }
-        });
-
-        const expenseTransactions = transactions.filter(transaction => {
-          return transaction.type === TRANSACTION_TYPES.EXPENSE;
-        });
-        
-        if (expenseTransactions.length !== 0) {
-          expenseStatistic = getStatisticByCategories(expenseTransactions);
-        };
-      }
+      const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
+        getStatisticByCategories(transactions);
 
       const data = [
         {
@@ -111,32 +92,30 @@ class Transaction {
     try {
       const user = req.user;
       const owner = user._id;
-      const year = Number(req.params.year)
 
-      const transactions = await TransactionModel.find({
-        owner,
-        // year: { $gte: year, $lte: year } // возвращает все транзакции
-        // year: { $gte: year } // возвращает все транзакции
-        // year: { $lte: year } // возвращает все транзакции
-        year // возвращает все транзакции
-      });
-      console.log('transactions', transactions);
+      const { year } = req.params;
 
-      // const result =  await TransactionModel.aggregate([
-      //   {
-      //     $match: {
-      //       owner,
-      //       year
-      //     },
-      //   },
-      // ]);
-      // console.log(result); // возвращает пустой массив
+      const transactions = await TransactionModel.find({ 
+        owner, 
+        "date.year": year, 
+      }); 
 
-      // TODO: сначала получить транзакции по дате
-      // TODO: потом собрать статистику как в предыдущем рауте (вынести функцию отдельно для переиспользовани)
-      res.json({
-        year,
-      })
+      const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
+        getStatisticByCategories(transactions);
+
+      const data = [
+        {
+          type: TRANSACTION_TYPES.INCOME,
+          totalIncomeSum
+        },
+        {
+          type: TRANSACTION_TYPES.EXPENSE,
+          totalExpenseSum,
+          expenseStatistic,
+        },
+      ];
+
+      return res.status(200).json(data);
     } catch (error) {
       next(error);
     }
@@ -144,18 +123,33 @@ class Transaction {
 
   async getStatisticByMonth(req, res, next) {
     try {
+      const user = req.user;
+      const owner = user._id;
+
       const { year, month } = req.params;
 
-      // let start = new Date(new Date().getTime() - 0.5 * 60 * 60 * 1000);
-      // const letters = await ChatSchema.find({ clan: "", date: { $gte: start } });
-      // res.status(200).json({ massage: "find lastLetters", letters: letters });
+      const transactions = await TransactionModel.find({ 
+        owner, 
+        "date.year": year, 
+        "date.month": month, 
+      }); 
 
-      // TODO: получить транзакции по дате и собрать статистику
-      
-      res.json({
-        year,
-        month
-      })
+      const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
+        getStatisticByCategories(transactions);
+
+      const data = [
+        {
+          type: TRANSACTION_TYPES.INCOME,
+          totalIncomeSum
+        },
+        {
+          type: TRANSACTION_TYPES.EXPENSE,
+          totalExpenseSum,
+          expenseStatistic,
+        },
+      ];
+
+      return res.status(200).json(data);
     } catch (error) {
       next(error)
     }

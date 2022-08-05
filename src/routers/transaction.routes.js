@@ -8,11 +8,4 @@ router.get("/statistic", authenticate, transaction.getStatistic);
 router.get("/statistic/:year/", authenticate, transaction.getStatisticByYear);
 router.get("/statistic/:year/:month", authenticate, transaction.getStatisticByMonth);
 
-// router.get(
-//  "/:id",
-//  authenticate,
-//  isValidId,
-//  transaction.getTransactionById
-// );
-
 module.exports = router;
