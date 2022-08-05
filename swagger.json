@@ -26,10 +26,10 @@
     "/auth/signup": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User registration",
+        "summary": "User signup",
         "parameters": [],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Signup object",
           "required": true,
           "content": {
             "application/json": {
@@ -40,7 +40,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful operation",
             "content": {
               "application/json": {
@@ -315,7 +315,7 @@
           "name": {
             "type": "string",
             "description": "User's name",
-            "example": "User"
+            "example": "user name"
           },
           "email": {
             "type": "string",
@@ -332,15 +332,40 @@
       "RegistrationResponse": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "user name"
+          },
           "email": {
             "type": "string",
             "description": "User's email",
             "format": "email"
           },
-          "userId": {
-            "type": "number",
+          "password": {
+            "type": "string",
+            "description": "User's hash password",
+            "example": "$2b$12$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
+          },
+          "verificationToken": {
+            "type": "string",
+            "description": "User's verificationToken",
+            "example": "62e6bc070f48b940eb37efe9"
+          },
+          "_id": {
+            "type": "string",
             "description": "User's id",
-            "example": "32143232436545474"
+            "example": "62e6bc075ac15ac3d52c43b7"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "User's created date",
+            "example": "2022-07-31T17:29:43.672Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "User's updated date",
+            "example": "2022-07-31T17:29:43.672Z"
           }
         }
       },
