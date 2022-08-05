@@ -1,6 +1,7 @@
 const { CATEGORIES_EXPENSE } = require("../constants/constants");
+const { TRANSACTION_TYPES } = require("../constants/constants");
 
-const getStatisticByCategories = (transactions) => {
+const getExpenseStatistic = (transactions) => {
   const statistic = [];
 
   CATEGORIES_EXPENSE.forEach(async category => {
@@ -23,6 +24,36 @@ const getStatisticByCategories = (transactions) => {
   })
   
   return statistic;
+}
+
+const getStatisticByCategories = (transactions) => {
+  let totalIncomeSum = 0;
+  let totalExpenseSum = 0;
+  let expenseStatistic = [];
+
+  if (transactions.length !== 0) {
+    transactions.forEach(transaction => {
+      if (transaction.type === TRANSACTION_TYPES.INCOME) {
+        totalIncomeSum += transaction.sum;
+      } else {
+        totalExpenseSum += transaction.sum;
+      }
+    });
+
+    const expenseTransactions = transactions.filter(transaction => {
+      return transaction.type === TRANSACTION_TYPES.EXPENSE;
+    });
+        
+    if (expenseTransactions.length !== 0) {
+      expenseStatistic = getExpenseStatistic(expenseTransactions);
+    };
+  }
+
+  return {
+    totalIncomeSum,
+    totalExpenseSum,
+    expenseStatistic
+  }
 };
 
 module.exports = getStatisticByCategories;

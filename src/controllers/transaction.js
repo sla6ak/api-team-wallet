@@ -12,7 +12,6 @@ class Transaction {
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
       const data = {
-        user, // TODO: нужно ли возвращать юзера, еще и со всеми полями?
         transactions,
       }
 
@@ -39,6 +38,8 @@ class Transaction {
           user._id,
           { currentBalance: balanceAfterTransaction },
           { new: true });
+      // TODO: тут скорей всего нужна проверка что юзер обновился
+      console.log(updatedUser); 
 
       // TODO: проверить есть ли другие транзакции после даты текущей транзакции и изменить в них поле balanceAfterTransaction
 
@@ -49,7 +50,6 @@ class Transaction {
       });
 
       const data = {
-        user: updatedUser, // TODO: нужно ли возвращать юзера, еще и со всеми полями?
         message: "Transaction was created successfully",
         transaction: newTransaction,
       };
@@ -66,27 +66,8 @@ class Transaction {
       const owner = user._id;
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
-      let totalIncomeSum = 0;
-      let totalExpenseSum = 0;
-      let expenseStatistic = [];
-
-      if (transactions.length !== 0) {
-        transactions.forEach(transaction => {
-          if (transaction.type === TRANSACTION_TYPES.INCOME) {
-            totalIncomeSum += transaction.sum;
-          } else {
-            totalExpenseSum += transaction.sum;
-          }
-        });
-
-        const expenseTransactions = transactions.filter(transaction => {
-          return transaction.type === TRANSACTION_TYPES.EXPENSE;
-        });
-        
-        if (expenseTransactions.length !== 0) {
-          expenseStatistic = getStatisticByCategories(expenseTransactions);
-        };
-      }
+      const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
+        getStatisticByCategories(transactions);
 
       const data = [
         {
@@ -104,6 +85,73 @@ class Transaction {
 
     } catch (error) {
       next(error);
+    }
+  }
+
+  async getStatisticByYear(req, res, next) {
+    try {
+      const user = req.user;
+      const owner = user._id;
+
+      const { year } = req.params;
+
+      const transactions = await TransactionModel.find({ 
+        owner, 
+        "date.year": year, 
+      }); 
+
+      const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
+        getStatisticByCategories(transactions);
+
+      const data = [
+        {
+          type: TRANSACTION_TYPES.INCOME,
+          totalIncomeSum
+        },
+        {
+          type: TRANSACTION_TYPES.EXPENSE,
+          totalExpenseSum,
+          expenseStatistic,
+        },
+      ];
+
+      return res.status(200).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getStatisticByMonth(req, res, next) {
+    try {
+      const user = req.user;
+      const owner = user._id;
+
+      const { year, month } = req.params;
+
+      const transactions = await TransactionModel.find({ 
+        owner, 
+        "date.year": year, 
+        "date.month": month, 
+      }); 
+
+      const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
+        getStatisticByCategories(transactions);
+
+      const data = [
+        {
+          type: TRANSACTION_TYPES.INCOME,
+          totalIncomeSum
+        },
+        {
+          type: TRANSACTION_TYPES.EXPENSE,
+          totalExpenseSum,
+          expenseStatistic,
+        },
+      ];
+
+      return res.status(200).json(data);
+    } catch (error) {
+      next(error)
     }
   }
 }
