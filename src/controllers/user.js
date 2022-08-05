@@ -139,6 +139,19 @@ class User {
       next(error);
     }
   }
+
+  async delete(req, res, next) {
+    try {
+      const { email } = req.user;
+      const user = await UserModel.findOneAndDelete({ email });
+      if (!user) {
+        throw createError(404);
+      }
+      return res.json({ user });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new User();
