@@ -33,7 +33,7 @@ class User {
         verificationToken,
       });
 
-      res.status(201).json({ user });
+      res.status(201).json(user);
     } catch (error) {
       next(error);
     }
