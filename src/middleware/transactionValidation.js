@@ -8,11 +8,7 @@ const newTransactionValidation = (req, res, next) => {
       type: Joi.string().valid("income", "expense").required(),
       category: Joi.string().valid(...CATEGORIES_INCOME, ...CATEGORIES_EXPENSE).required(),
       sum: Joi.number().required(),
-      date: {
-        year: Joi.number().required(),
-        month: Joi.number().required(),
-        day: Joi.number().required(),
-      }
+      date: Joi.string().required(),
     });
 
     const { error } = schema.validate(req.body);
