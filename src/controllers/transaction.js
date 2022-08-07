@@ -11,6 +11,15 @@ class Transaction {
 
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
+      const test = await TransactionModel.find({ 
+        owner, 
+        "date.year": { $gte: 2022 },
+      }); 
+      const test2 = test.filter(transaction => {
+        return transaction.date.month >= 8
+      });
+      console.log(test2);
+
       const data = {
         transactions,
       }
