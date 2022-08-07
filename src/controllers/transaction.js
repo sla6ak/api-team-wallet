@@ -11,15 +11,6 @@ class Transaction {
 
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
-      const test = await TransactionModel.find({ 
-        owner, 
-        "date.year": { $gte: 2022 },
-      }); 
-      const test2 = test.filter(transaction => {
-        return transaction.date.month >= 8
-      });
-      console.log(test2);
-
       const data = {
         transactions,
       }
@@ -33,6 +24,7 @@ class Transaction {
   async addNewTransaction(req, res, next) {
     try {
       const user = req.user;
+      const owner = user._id;
       const { type, sum, date: dateString } = req.body;
 
       const newDate = new Date(dateString);
@@ -59,6 +51,32 @@ class Transaction {
       console.log(updatedUser); 
 
       // TODO: проверить есть ли другие транзакции после даты текущей транзакции и изменить в них поле balanceAfterTransaction
+      const test = await TransactionModel.find({ 
+        owner, 
+        "date.year": { $gte: date.year },
+      }); 
+      // eslint-disable-next-line array-callback-return
+      const test2 = test.filter(transaction => {
+        if (transaction.date.year === date.year) {
+          if (transaction.date.month >= date.month) {
+            if (transaction.date.day >= date.day) {
+              return transaction;
+            }
+          }
+        } else if (transaction.date.year > date.year) {
+          return transaction;
+        } 
+        
+      });
+      test2.forEach(async transaction => {
+        await TransactionModel.findByIdAndUpdate(transaction._id, {
+          balanceAfterTransaction: 
+            type === "income"
+              ? balanceAfterTransaction + sum
+              : balanceAfterTransaction - sum
+        })
+      })
+      console.log('test2', test2);
 
       const newTransaction = await TransactionModel.create({
         ...req.body,
