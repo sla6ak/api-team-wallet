@@ -1,17 +1,11 @@
 const router = require("express").Router();
-const { authenticate } = require("../middleware");
-// const { isValidId } = require("../middleware");
+const { authenticate, newTransactionValidation } = require("../middleware");
 const transaction = require("../controllers/transaction");
 
-router.get("/transaction", authenticate, transaction.getAllTransaction);
-
-// router.get(
-//  "/transaction/:id",
-//  authenticate,
-//  isValidId,
-//  transaction.getTransactionById
-// );
-
-router.post("/transaction", authenticate, transaction.addNewTransaction);
+router.get("/all", authenticate, transaction.getAllTransaction);
+router.post("/add", authenticate, newTransactionValidation, transaction.addNewTransaction);
+router.get("/statistic", authenticate, transaction.getStatistic);
+router.get("/statistic/:year/", authenticate, transaction.getStatisticByYear);
+router.get("/statistic/:year/:month", authenticate, transaction.getStatisticByMonth);
 
 module.exports = router;

@@ -11,12 +11,14 @@ const defaultResponseData = (status = 200, message = statusCode[status]) => {
     },
 
     transaction: {
-      date: null,
       type: null,
-      sum: null,
-      _id: null,
-      owner: null,
+      category: null,
       balanceAfterTransaction: null,
+      sum: null,
+      date: null,
+      comment: null,
+      owner: null,
+      _id: null,
     },
 
     status,

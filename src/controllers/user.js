@@ -1,7 +1,7 @@
 const UserModel = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { createError, defaultResponseData } = require("../helpers");
+const { createError } = require("../helpers");
 const idGeneration = require("bson-objectid");
 const { sendMail, sgMailData } = require("../helpers");
 
@@ -12,8 +12,7 @@ const { JWT_SECRET_KEY } = process.env;
 class User {
   async addNewUser(req, res, next) {
     const { email, password, requireVerificationEmail } = req.body;
-
-    console.log(`${email}, ${password}, ${requireVerificationEmail}`);
+    const host = req.headers.host;
 
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
@@ -25,8 +24,7 @@ class User {
 
       const verificationToken = idGeneration();
       if (requireVerificationEmail) {
-        const send = await sendMail(sgMailData(verificationToken, email), next);
-        console.log(send);
+        await sendMail(sgMailData(verificationToken, email, host), next);
       }
 
       const user = await UserModel.create({
@@ -35,8 +33,7 @@ class User {
         verificationToken,
       });
 
-      const data = { ...defaultResponseData(), user };
-      res.json(data);
+      res.status(201).json(user);
     } catch (error) {
       next(error);
     }
@@ -45,32 +42,30 @@ class User {
   async userLogin(req, res, next) {
     try {
       const { email, password } = req.body;
-      const result = await UserModel.findOne({ email });
+      const user = await UserModel.findOne({ email });
 
-      if (!result) {
+      if (!user) {
         throw createError(401, `Email or password is wrong`);
       }
 
-      if (result.requireVerificationEmail && !result.verify) {
+      if (user.requireVerificationEmail && !user.verify) {
         throw createError(401, `User ${email} not verify`);
       }
 
-      const isPassword = await bcrypt.compare(password, result.password);
+      const isPassword = await bcrypt.compare(password, user.password);
 
       if (!isPassword) {
         throw createError(401, `Email or password is wrong`);
       }
 
-      const token = jwt.sign({ id: result._id }, JWT_SECRET_KEY, {
+      const token = jwt.sign({ id: user._id }, JWT_SECRET_KEY, {
         expiresIn: "30d",
       });
 
-      await UserModel.findByIdAndUpdate(result._id, { token });
-      const user = await UserModel.findOne(result._id);
+      await UserModel.findByIdAndUpdate(user._id, { token });
       user.token = token;
 
-      const data = { ...defaultResponseData(), user };
-      return res.json(data);
+      return res.json({ user });
     } catch (error) {
       next(error);
     }
@@ -83,8 +78,7 @@ class User {
       if (!user) {
         throw createError(404);
       }
-      const data = { ...defaultResponseData(), user };
-      return res.json(data);
+      return res.json({ user });
     } catch (error) {
       next(error);
     }
@@ -97,8 +91,7 @@ class User {
       if (!user) {
         throw createError(404);
       }
-      console.log(user);
-      return res.status(204).json();
+      return res.status(200).json({ message: "Logout success" });
     } catch (error) {
       next(error);
     }

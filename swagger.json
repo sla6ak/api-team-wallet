@@ -2,10 +2,10 @@
   "openapi": "3.0.1",
   "info": {
     "version": "1.0.0",
-    "title": "Swagger test",
-    "description": "Showing off swagger-ui-express",
+    "title": "Wallet API",
+    "description": "API wallet application",
     "license": {
-      "name": "MIT",
+      "name": "Wallet - Website",
       "url": "https://opensource.org/licenses/MIT"
     }
   },
@@ -99,10 +99,6 @@
           "401": {
             "description": "'Email or password is wrong', 'User 'email' not verify'",
             "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
-            "content": {}
           }
         }
       }
@@ -111,19 +107,16 @@
       "get": {
         "tags": ["Auth"],
         "summary": "Get current user",
-        "parameters": [],
-        "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Current object",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CurrentRequest"
-              }
-            }
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "the token issued to the current user"
           }
-        },
+        ],
+        "security": [{ "Bearer": [] }],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -150,23 +143,26 @@
       "post": {
         "tags": ["Auth"],
         "summary": "User logout",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          }
+        ],
         "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Logout object",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LogoutRequest"
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
               }
             }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Successful operation",
-            "content": {}
           },
           "401": {
             "description": "Not authorized",
@@ -248,10 +244,6 @@
               }
             }
           },
-          "400": {
-            "description": "Verification has already been passed",
-            "content": {}
-          },
           "404": {
             "description": "User not found",
             "content": {}
@@ -263,29 +255,73 @@
         }
       }
     },
-    "/transaction": {
+    "/transaction/all": {
       "get": {
         "tags": ["Transaction"],
-        "summary": "User transaction",
-        "parameters": [],
+        "summary": "User transactions",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          }
+        ],
+        "requestBody": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionAllResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/transaction/add": {
+      "post": {
+        "tags": ["Transaction"],
+        "summary": "Add transactions",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          }
+        ],
         "requestBody": {
-          "description": "Transaction's object",
+          "description": "transaction object",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
+                "$ref": "#/components/schemas/AddTransactionRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/AddTransactionResponse"
                 }
               }
             }
@@ -294,12 +330,129 @@
             "description": "JoiError. Missing required field",
             "content": {}
           },
-          "409": {
-            "description": "User not created. Email is duplicate",
+          "401": {
+            "description": "Not authorized",
             "content": {}
           },
           "500": {
             "description": "Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/transaction/statistic": {
+      "get": {
+        "tags": ["Transaction"],
+        "summary": "User transaction statistics",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          }
+        ],
+        "requestBody": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/transaction/statistic/:year": {
+      "get": {
+        "tags": ["Transaction"],
+        "summary": "User transaction statistics for the year",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "type": "string",
+            "description": "year transactions"
+          }
+        ],
+        "requestBody": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/transaction/statistic/:year/:month": {
+      "get": {
+        "tags": ["Transaction"],
+        "summary": "User transaction statistics for the month",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "type": "string",
+            "description": "year transactions"
+          },
+          {
+            "in": "path",
+            "name": "month",
+            "required": true,
+            "type": "string",
+            "description": "month transactions"
+          }
+        ],
+        "requestBody": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
             "content": {}
           }
         }
@@ -332,40 +485,65 @@
       "RegistrationResponse": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "description": "User's name",
-            "example": "user name"
-          },
-          "email": {
-            "type": "string",
-            "description": "User's email",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "User's hash password",
-            "example": "$2b$12$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
-          },
-          "verificationToken": {
-            "type": "string",
-            "description": "User's verificationToken",
-            "example": "62e6bc070f48b940eb37efe9"
-          },
-          "_id": {
-            "type": "string",
-            "description": "User's id",
-            "example": "62e6bc075ac15ac3d52c43b7"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "User's created date",
-            "example": "2022-07-31T17:29:43.672Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "User's updated date",
-            "example": "2022-07-31T17:29:43.672Z"
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "user name"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "description": "User's hash password",
+                "example": "$2b$12$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
+              },
+              "currentBalance": {
+                "type": "number",
+                "description": "User balance",
+                "example": 0
+              },
+              "token": {
+                "type": "string",
+                "description": "User's token",
+                "example": ""
+              },
+              "requireVerificationEmail": {
+                "type": "boolean",
+                "description": "require email verification",
+                "example": false
+              },
+              "verify": {
+                "type": "string",
+                "description": "verify user",
+                "example": false
+              },
+              "verificationToken": {
+                "type": "string",
+                "description": "User's verificationToken",
+                "example": "62e6bc070f48b940eb37efe9"
+              },
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "62e6bc075ac15ac3d52c43b7"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User's created date",
+                "example": "2022-07-31T17:29:43.672Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "description": "User's updated date",
+                "example": "2022-07-31T17:29:43.672Z"
+              }
+            }
           }
         }
       },
@@ -388,62 +566,151 @@
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's email",
-            "format": "email"
-          },
-          "userId": {
-            "type": "number",
-            "description": "User's id",
-            "example": "32143232436545474"
-          }
-        }
-      },
-      "CurrentRequest": {
-        "type": "object",
-        "required": ["email", "password"],
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's email",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "User's password",
-            "example": "qwerty123"
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "62e6bc075ac15ac3d52c43b7"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "user name"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "description": "User's hash password",
+                "example": "$2b$32$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
+              },
+              "currentBalance": {
+                "type": "number",
+                "description": "User balance",
+                "example": 0
+              },
+              "token": {
+                "type": "string",
+                "description": "User's token",
+                "example": "rJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZWQ1YmM5ZWYxNDYyYmNhY2YxNjdkMSIsImlhdCI6MTY1OTcyNDQ5OSwiZXhwIjoxNjYyMzE2NDk5fQ.9yigGtO-dmmeqfWNMyUs_JNQhoVdQaKik3ldbKdwzIo"
+              },
+              "requireVerificationEmail": {
+                "type": "boolean",
+                "description": "require email verification",
+                "example": false
+              },
+              "verify": {
+                "type": "string",
+                "description": "verify user",
+                "example": false
+              },
+              "verificationToken": {
+                "type": "string",
+                "description": "User's verificationToken",
+                "example": "62e6bc070f48b940eb37efe9"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User's created date",
+                "example": "2022-07-31T17:29:43.672Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "description": "User's updated date",
+                "example": "2022-07-31T17:29:43.672Z"
+              }
+            }
           }
         }
       },
       "CurrentResponse": {
         "type": "object",
         "properties": {
-          "email": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "62e6bc075ac15ac3d52c43b7"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "user name"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "description": "User's hash password",
+                "example": "$2b$32$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
+              },
+              "currentBalance": {
+                "type": "number",
+                "description": "User balance",
+                "example": 0
+              },
+              "token": {
+                "type": "string",
+                "description": "User's token",
+                "example": "rJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZWQ1YmM5ZWYxNDYyYmNhY2YxNjdkMSIsImlhdCI6MTY1OTcyNDQ5OSwiZXhwIjoxNjYyMzE2NDk5fQ.9yigGtO-dmmeqfWNMyUs_JNQhoVdQaKik3ldbKdwzIo"
+              },
+              "requireVerificationEmail": {
+                "type": "boolean",
+                "description": "require email verification",
+                "example": false
+              },
+              "verify": {
+                "type": "string",
+                "description": "verify user",
+                "example": false
+              },
+              "verificationToken": {
+                "type": "string",
+                "description": "User's verificationToken",
+                "example": "62e6bc070f48b940eb37efe9"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User's created date",
+                "example": "2022-07-31T17:29:43.672Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "description": "User's updated date",
+                "example": "2022-07-31T17:29:43.672Z"
+              }
+            }
+          }
+        }
+      },
+      "LogoutResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
             "type": "string",
-            "description": "User's email",
-            "format": "email"
-          },
-          "userId": {
-            "type": "number",
-            "description": "User's id",
-            "example": "32143232436545474"
+            "description": "message",
+            "example": "Logout success"
           }
         }
       },
       "VerifyRequest": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": ["email"],
         "properties": {
           "email": {
             "type": "string",
             "description": "User's email",
             "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "User's password",
-            "example": "qwerty123"
           }
         }
       },
@@ -467,26 +734,265 @@
           }
         }
       },
-      "RegistResponse": {
+      "TransactionAllResponse": {
+        "type": "object",
+        "properties": {
+          "transaction": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "object",
+                  "properties": {
+                    "year": {
+                      "type": "number",
+                      "description": "year of operation",
+                      "example": 2022
+                    },
+                    "month": {
+                      "type": "number",
+                      "description": "month of operation",
+                      "example": 10
+                    },
+                    "day": {
+                      "type": "number",
+                      "description": "day of operation",
+                      "example": 15
+                    }
+                  }
+                },
+                "_id": {
+                  "type": "string",
+                  "description": "transaction id",
+                  "example": "62e6bc075ac15ac3d53c33b8"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "type transaction",
+                  "example": "expense"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "category transaction",
+                  "example": "salary"
+                },
+                "balanceAfterTransaction": {
+                  "type": "number",
+                  "description": "balance after transaction",
+                  "example": 120
+                },
+                "sum": {
+                  "type": "number",
+                  "description": "sum of transaction",
+                  "example": 30
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "user id",
+                  "example": "62e6bc075ac15ac3d52c43b7"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AddTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "type transaction",
+            "enum": ["income", "expense"]
+          },
+          "category": {
+            "type": "string",
+            "description": "category transaction",
+            "enum": [
+              "salary",
+              "gift",
+              "other",
+              "food",
+              "car",
+              "children",
+              "house",
+              "education",
+              "self care",
+              "leisure",
+              "other"
+            ]
+          },
+          "sum": {
+            "type": "number",
+            "description": "sum of transaction",
+            "example": 17800
+          },
+          "date": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "number",
+                "description": "year of operation",
+                "example": 2022
+              },
+              "month": {
+                "type": "number",
+                "description": "month of operation",
+                "example": 11
+              },
+              "day": {
+                "type": "number",
+                "description": "day of operation",
+                "example": 12
+              }
+            }
+          }
+        }
+      },
+      "AddTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "message about the completed operation",
+            "example": "Transaction was created successfully"
+          },
+          "transaction": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "type transaction",
+                "example": "expense"
+              },
+              "category": {
+                "type": "string",
+                "description": "category transaction",
+                "example": "salary"
+              },
+              "balanceAfterTransaction": {
+                "type": "number",
+                "description": "balance after transaction",
+                "example": 17920
+              },
+              "sum": {
+                "type": "number",
+                "description": "sum of transaction",
+                "example": 17800
+              },
+              "date": {
+                "type": "object",
+                "properties": {
+                  "year": {
+                    "type": "number",
+                    "description": "year of operation",
+                    "example": 2022
+                  },
+                  "month": {
+                    "type": "number",
+                    "description": "month of operation",
+                    "example": 11
+                  },
+                  "day": {
+                    "type": "number",
+                    "description": "day of operation",
+                    "example": 12
+                  }
+                }
+              },
+              "owner": {
+                "type": "string",
+                "description": "user id",
+                "example": "62e6bc075ac15ac3d56c44c7"
+              },
+              "_id": {
+                "type": "string",
+                "description": "user id",
+                "example": "62e6bc075ac15ac3d53c33b8"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User's created date",
+                "example": "2022-07-31T17:29:43.672Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "description": "User's updated date",
+                "example": "2022-07-31T17:29:43.672Z"
+              }
+            }
+          }
+        }
+      },
+      "StatisticResponse": {
         "type": "array",
-        "items": {
+        "income": {
           "type": "object",
           "properties": {
-            "email": {
+            "type": {
               "type": "string",
-              "description": "User's email",
-              "format": "email"
+              "description": "transaction type",
+              "example": "income"
             },
-            "userId": {
+            "totalIncomeSum": {
               "type": "number",
-              "description": "User's id",
-              "example": "32143232436545474"
+              "description": "total income",
+              "example": 22800
+            }
+          }
+        },
+        "expense": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "transaction type",
+              "example": "income"
+            },
+            "totalExpenseSum": {
+              "type": "number",
+              "description": "total expanse",
+              "example": 5050
+            },
+            "expenseStatistic": {
+              "type": "array",
+              "item": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "expense category",
+                    "example": "car"
+                  },
+                  "totalSumByCategory": {
+                    "type": "number",
+                    "description": "expense sum",
+                    "example": 1850
+                  }
+                }
+              }
             }
           }
         },
         "example": [
-          { "email": "1@gmail.com", "userId": "1" },
-          { "email": "2@gmail.com", "userId": "2" }
+          {
+            "type": "income",
+            "totalIncomeSum": 22800
+          },
+          {
+            "type": "expense",
+            "totalExpenseSum": 5050,
+            "expenseStatistic": [
+              {
+                "category": "car",
+                "totalSumByCategory": 1850
+              },
+              {
+                "category": "house",
+                "totalSumByCategory": 3200
+              }
+            ]
+          }
         ]
       }
     },

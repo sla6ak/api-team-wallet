@@ -1,32 +1,36 @@
 const { Schema, model } = require("mongoose");
+const { CATEGORIES_INCOME, CATEGORIES_EXPENSE } = require("../constants/constants");
 
-const schema = new Schema(
-  {
-    currentBalance: {
-      type: Number,
-      required: [true, "Set current balance"],
-    },
-    date: {
-      type: Date,
-      required: [true, "Set date"],
-    },
-    sum: {
-      type: Number,
-      required: [true, "Set operation sum"],
-    },
-    type: {
-      type: Boolean,
-      required: [true, "Set operation type"],
-    },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-    },
+const transactionSchema = new Schema({
+  type: {
+    type: String,
+    enum: ["income", "expense"],
+    required: [true, "Transaction type is required"],
   },
-  {
-    versionKey: false,
-    timestamps: true,
-  }
-);
+  category: {
+    type: String,
+    enum: [...CATEGORIES_INCOME, ...CATEGORIES_EXPENSE],
+    required: [true, "Transaction category is required"],
+  },
+  balanceAfterTransaction: { 
+    type: Number, 
+  }, 
+  sum: {
+    type: Number,
+    required: [true, "Sum of transaction is required"],
+  },
+  date: {
+    year: { type: Number, required: true },
+    month: { type: Number, required: true },
+    day: { type: Number, required: true},
+  },
+  comment: {
+    type: String,
+  },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+  },
+}, { versionKey: false, timestamps: true });
 
-module.exports = model("transaction", schema);
+module.exports = model("transaction", transactionSchema);
