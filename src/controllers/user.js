@@ -33,7 +33,7 @@ class User {
         verificationToken,
       });
 
-      res.status(201).json({ user });
+      res.status(201).json(user);
     } catch (error) {
       next(error);
     }
@@ -135,6 +135,19 @@ class User {
       await sendMail(sgMailData(user.verificationToken, email), next);
 
       res.json({ message: "Verification email sent" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req, res, next) {
+    try {
+      const { email } = req.user;
+      const user = await UserModel.findOneAndDelete({ email });
+      if (!user) {
+        throw createError(404);
+      }
+      return res.json({ user });
     } catch (error) {
       next(error);
     }

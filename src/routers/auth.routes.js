@@ -16,6 +16,8 @@ router.post("/logout", authenticate, user.logOutUser);
 
 router.post("/verify", user.resendVerifyEmail);
 
-router.get("/verify/:verificationToken", user.verifyEmail);
+router.patch("/verify/:verificationToken", user.verifyEmail);
+
+router.delete("/delete", authenticate, user.delete);
 
 module.exports = router;

@@ -33,7 +33,15 @@ class Transaction {
   async addNewTransaction(req, res, next) {
     try {
       const user = req.user;
-      const { type, sum } = req.body;
+      const { type, sum, date: dateString } = req.body;
+
+      const newDate = new Date(dateString);
+
+      const date = {
+        year: newDate.getFullYear(),
+        month: newDate.getMonth() + 1,
+        day: newDate.getDay(),
+      };
 
       const previousBalance = user.currentBalance;
 
@@ -54,6 +62,7 @@ class Transaction {
 
       const newTransaction = await TransactionModel.create({
         ...req.body,
+        date,
         balanceAfterTransaction,
         owner: user._id,
       });
