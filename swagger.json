@@ -268,6 +268,7 @@
             "description": "verification token"
           }
         ],
+        "security": [{ "Bearer": [] }],
         "requestBody": "",
         "responses": {
           "200": {
@@ -304,6 +305,7 @@
             "description": "verification token"
           }
         ],
+        "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "transaction object",
           "required": true,
@@ -354,6 +356,7 @@
             "description": "verification token"
           }
         ],
+        "security": [{ "Bearer": [] }],
         "requestBody": "",
         "responses": {
           "200": {
@@ -393,6 +396,7 @@
             "description": "year transactions"
           }
         ],
+        "security": [{ "Bearer": [] }],
         "requestBody": "",
         "responses": {
           "200": {
@@ -439,6 +443,7 @@
             "description": "month transactions"
           }
         ],
+        "security": [{ "Bearer": [] }],
         "requestBody": "",
         "responses": {
           "200": {
