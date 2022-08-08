@@ -816,7 +816,6 @@
             "enum": [
               "salary",
               "gift",
-              "other",
               "food",
               "car",
               "children",
