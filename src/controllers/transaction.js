@@ -1,6 +1,10 @@
 const TransactionModel = require("../models/transaction");
 const UserModel = require("../models/user");
-const { getStatisticByCategories } = require("../helpers");
+const {
+  getStatisticByCategories,
+  isLaterTransaction,
+  countBalance,
+} = require("../helpers");
 const { TRANSACTION_TYPES } = require("../constants/constants");
 
 class Transaction {
@@ -37,46 +41,52 @@ class Transaction {
 
       const previousBalance = user.currentBalance;
 
-      const balanceAfterTransaction =
-        type === TRANSACTION_TYPES.INCOME
-          ? previousBalance + sum
-          : previousBalance - sum;
+      const currentBalance = countBalance(type, previousBalance, sum);
 
-      const updatedUser =
-        await UserModel.findByIdAndUpdate(
-          user._id,
-          { currentBalance: balanceAfterTransaction },
-          { new: true });
-      // TODO: тут скорей всего нужна проверка что юзер обновился
-      console.log(updatedUser); 
+      let balanceAfterTransaction;
 
-      // TODO: проверить есть ли другие транзакции после даты текущей транзакции и изменить в них поле balanceAfterTransaction
-      const test = await TransactionModel.find({ 
+      const laterTransactionsByYear = await TransactionModel.find({ 
         owner, 
         "date.year": { $gte: date.year },
       }); 
+
       // eslint-disable-next-line array-callback-return
-      const test2 = test.filter(transaction => {
-        if (transaction.date.year === date.year) {
-          if (transaction.date.month >= date.month) {
-            if (transaction.date.day >= date.day) {
-              return transaction;
-            }
-          }
-        } else if (transaction.date.year > date.year) {
+      const laterTransactionsByFullDate = laterTransactionsByYear.filter(transaction => {
+        if (isLaterTransaction(transaction, date)) {
           return transaction;
-        } 
-        
+        }
       });
-      test2.forEach(async transaction => {
-        await TransactionModel.findByIdAndUpdate(transaction._id, {
-          balanceAfterTransaction: 
-            type === "income"
-              ? balanceAfterTransaction + sum
-              : balanceAfterTransaction - sum
-        })
-      })
-      console.log('test2', test2);
+
+      if (laterTransactionsByFullDate.length === 0) {
+        balanceAfterTransaction = currentBalance;
+      }
+
+      if (laterTransactionsByFullDate.length > 0) {
+        const temp = [];
+
+        laterTransactionsByFullDate.forEach(async transaction => {
+          temp.push(transaction.balanceAfterTransaction);
+
+          const updatedBalanceAfterTransaction = countBalance(
+            type,
+            transaction.balanceAfterTransaction,
+            sum);
+          console.log('updatedBalanceAfterTransaction', updatedBalanceAfterTransaction);
+                      
+          const updatedTransaction = await TransactionModel.findByIdAndUpdate(transaction._id, {
+            balanceAfterTransaction: updatedBalanceAfterTransaction,
+          }, { new: true });
+          console.log(updatedTransaction); // check
+        });
+
+        const max = Math.max(...temp);
+        const earliestTransaction =
+          laterTransactionsByFullDate.filter(transaction =>
+            transaction.balanceAfterTransaction === max
+          );
+
+        balanceAfterTransaction = earliestTransaction[0].balanceAfterTransaction;
+      };
 
       const newTransaction = await TransactionModel.create({
         ...req.body,
@@ -84,6 +94,14 @@ class Transaction {
         balanceAfterTransaction,
         owner: user._id,
       });
+      console.log(newTransaction); // check
+
+      const updatedUser =
+        await UserModel.findByIdAndUpdate(
+          user._id,
+          { currentBalance },
+          { new: true });
+      console.log(updatedUser); // check
 
       const data = {
         message: "Transaction was created successfully",

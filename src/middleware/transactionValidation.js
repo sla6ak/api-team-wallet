@@ -9,6 +9,7 @@ const newTransactionValidation = (req, res, next) => {
       category: Joi.string().valid(...CATEGORIES_INCOME, ...CATEGORIES_EXPENSE).required(),
       sum: Joi.number().required(),
       date: Joi.string().required(),
+      comment: Joi.string(),
     });
 
     const { error } = schema.validate(req.body);
