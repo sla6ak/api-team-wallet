@@ -31,7 +31,7 @@ class Transaction {
       const date = {
         year: newDate.getFullYear(),
         month: newDate.getMonth() + 1,
-        day: newDate.getDay(),
+        day: newDate.getDate(),
       };
 
       const previousBalance = user.currentBalance;
