@@ -60,30 +60,28 @@ class Transaction {
       if (laterTransactionsByFullDate.length === 0) {
         balanceAfterTransaction = currentBalance;
       }
-
+      
       if (laterTransactionsByFullDate.length > 0) {
-        const temp = [];
-
-        laterTransactionsByFullDate.forEach(async transaction => {
+        const temp = [];        
+        
+        laterTransactionsByFullDate.forEach(async transaction => {     
           temp.push(transaction.balanceAfterTransaction);
-
+          
           const updatedBalanceAfterTransaction = countBalance(
             type,
             transaction.balanceAfterTransaction,
             sum);
-          console.log('updatedBalanceAfterTransaction', updatedBalanceAfterTransaction);
-                      
-          const updatedTransaction = await TransactionModel.findByIdAndUpdate(transaction._id, {
-            balanceAfterTransaction: updatedBalanceAfterTransaction,
-          }, { new: true });
-          console.log(updatedTransaction); // check
-        });
+            
+            const updatedTransaction = await TransactionModel.findByIdAndUpdate(transaction._id, {
+              balanceAfterTransaction: updatedBalanceAfterTransaction,
+            }, { new: true });
+            console.log(updatedTransaction); // check
+          });
 
         const max = Math.max(...temp);
-        const earliestTransaction =
-          laterTransactionsByFullDate.filter(transaction =>
+        const earliestTransaction = laterTransactionsByFullDate.filter(transaction =>
             transaction.balanceAfterTransaction === max
-          );
+        );
 
         balanceAfterTransaction = earliestTransaction[0].balanceAfterTransaction;
       };
@@ -94,14 +92,14 @@ class Transaction {
         balanceAfterTransaction,
         owner: user._id,
       });
-      console.log(newTransaction); // check
 
+      // eslint-disable-next-line no-unused-vars
       const updatedUser =
         await UserModel.findByIdAndUpdate(
           user._id,
           { currentBalance },
           { new: true });
-      console.log(updatedUser); // check
+      // console.log(updatedUser); // check
 
       const data = {
         message: "Transaction was created successfully",
