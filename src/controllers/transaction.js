@@ -4,7 +4,7 @@ const {
   getStatisticByCategories,
   isLaterTransaction,
   countBalance,
-  findNextDay,
+  findNextTransaction,
 } = require("../helpers");
 const { TRANSACTION_TYPES } = require("../constants/constants");
 
@@ -42,9 +42,7 @@ class Transaction {
       };
 
       const previousBalance = user.currentBalance;
-
       const currentBalance = countBalance(type, previousBalance, sum);
-
       let balanceAfterTransaction;
 
       const laterTransactionsByYear = await TransactionModel.find({ 
@@ -64,40 +62,30 @@ class Transaction {
       }
       
       if (laterTransactionsByFullDate.length > 0) {
-        const temp = [];        
-        
         laterTransactionsByFullDate.forEach(async transaction => {     
-          temp.push(transaction.balanceAfterTransaction);
-          
           const updatedBalanceAfterTransaction = countBalance(
             type,
             transaction.balanceAfterTransaction,
             sum);
             
-            // eslint-disable-next-line no-unused-vars
             const updatedTransaction = await TransactionModel.findByIdAndUpdate(transaction._id, {
               balanceAfterTransaction: updatedBalanceAfterTransaction,
             }, { new: true });
-            // console.log(updatedTransaction); // check
+            console.log(updatedTransaction);
           });
 
-        // взять первую за следующий день
-        const nextDay = laterTransactionsByFullDate.filter(transaction => {
-          return transaction.date.year === date.year
-            && transaction.date.month === date.month
-            && transaction.date.day === date.day + 1
-        })
-        console.log('same', nextDay)
+        const nearestNextTransaction = findNextTransaction(laterTransactionsByFullDate, date);
 
-        const test = findNextDay(laterTransactionsByFullDate, date);
-        console.log('test', test);
-
-        let prevBal;
-        if (nextDay[0].type === "income") {
-          prevBal = nextDay[0].balanceAfterTransaction - nextDay[0].sum
-        } else if (nextDay[0].type === "expense") {
-          prevBal = nextDay[0].balanceAfterTransaction + nextDay[0].sum
-        }
+        const countPrevBal = (transaction) => {
+          let result;
+          if (transaction.type === TRANSACTION_TYPES.INCOME) {
+            result = transaction.balanceAfterTransaction - transaction.sum
+          } else if (transaction.type === TRANSACTION_TYPES.EXPENSE) {
+            result = transaction.balanceAfterTransaction + transaction.sum
+          };
+          return result;
+        };
+        const prevBal = countPrevBal(nearestNextTransaction[0]);
 
         balanceAfterTransaction = countBalance(type, prevBal, sum);
       };
