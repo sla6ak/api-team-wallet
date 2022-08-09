@@ -78,12 +78,28 @@ class Transaction {
             console.log(updatedTransaction); // check
           });
 
-        const max = Math.max(...temp);
-        const earliestTransaction = laterTransactionsByFullDate.filter(transaction =>
-            transaction.balanceAfterTransaction === max
-        );
+        // взять первую за этот день и взять ее баланс
+        const nextDay = laterTransactionsByFullDate.filter(transaction => {
+          return transaction.date.year === date.year
+            && transaction.date.month === date.month
+            && transaction.date.day === date.day + 1
+        })
+        console.log('same', nextDay)
 
-        balanceAfterTransaction = earliestTransaction[0].balanceAfterTransaction;
+        let prevBal;
+        if (nextDay[0].type === "income") {
+          prevBal = nextDay[0].balanceAfterTransaction - nextDay[0].sum
+        } else if (nextDay[0].type === "expense") {
+          prevBal = nextDay[0].balanceAfterTransaction + nextDay[0].sum
+        }
+
+        if (type === "income") {
+          balanceAfterTransaction = prevBal + sum
+        } else if (type === "expense") {
+          balanceAfterTransaction = prevBal + sum
+        }
+
+        // balanceAfterTransaction = sameDay[0].balanceAfterTransaction;
       };
 
       const newTransaction = await TransactionModel.create({
