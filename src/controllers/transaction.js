@@ -4,6 +4,7 @@ const {
   getStatisticByCategories,
   isLaterTransaction,
   countBalance,
+  findNextDay,
 } = require("../helpers");
 const { TRANSACTION_TYPES } = require("../constants/constants");
 
@@ -73,19 +74,23 @@ class Transaction {
             transaction.balanceAfterTransaction,
             sum);
             
+            // eslint-disable-next-line no-unused-vars
             const updatedTransaction = await TransactionModel.findByIdAndUpdate(transaction._id, {
               balanceAfterTransaction: updatedBalanceAfterTransaction,
             }, { new: true });
-            console.log(updatedTransaction); // check
+            // console.log(updatedTransaction); // check
           });
 
-        // взять первую за этот день и взять ее баланс
+        // взять первую за следующий день
         const nextDay = laterTransactionsByFullDate.filter(transaction => {
           return transaction.date.year === date.year
             && transaction.date.month === date.month
             && transaction.date.day === date.day + 1
         })
         console.log('same', nextDay)
+
+        const test = findNextDay(laterTransactionsByFullDate, date);
+        console.log('test', test);
 
         let prevBal;
         if (nextDay[0].type === "income") {
@@ -94,13 +99,7 @@ class Transaction {
           prevBal = nextDay[0].balanceAfterTransaction + nextDay[0].sum
         }
 
-        if (type === "income") {
-          balanceAfterTransaction = prevBal + sum
-        } else if (type === "expense") {
-          balanceAfterTransaction = prevBal + sum
-        }
-
-        // balanceAfterTransaction = sameDay[0].balanceAfterTransaction;
+        balanceAfterTransaction = countBalance(type, prevBal, sum);
       };
 
       const newTransaction = await TransactionModel.create({
@@ -110,13 +109,11 @@ class Transaction {
         owner: user._id,
       });
 
-      // eslint-disable-next-line no-unused-vars
       const updatedUser =
         await UserModel.findByIdAndUpdate(
           user._id,
           { currentBalance },
           { new: true });
-      // console.log(updatedUser); // check
 
       const data = {
         message: "Transaction was created successfully",

@@ -4,6 +4,7 @@ const defaultResponseData = require("./defaultResponseData/defaultResponseData")
 const getStatisticByCategories = require("./getStatisticByCategories");
 const isLaterTransaction = require("./transactions/isLaterTransaction");
 const countBalance = require('./transactions/countBalance');
+const findNextDay = require('./transactions/findNextDay');
 
 module.exports = {
   createError,
@@ -13,4 +14,5 @@ module.exports = {
   getStatisticByCategories,
   isLaterTransaction,
   countBalance,
+  findNextDay,
 };
