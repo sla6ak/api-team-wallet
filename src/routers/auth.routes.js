@@ -14,7 +14,7 @@ router.get("/current", authenticate, user.getCurrentUser);
 
 router.post("/logout", authenticate, user.logOutUser);
 
-router.post("/verify", user.resendVerifyEmail);
+router.get("/verify", user.resendVerifyEmail);
 
 router.patch("/verify/:verificationToken", user.verifyEmail);
 

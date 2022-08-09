@@ -12,7 +12,6 @@ const { JWT_SECRET_KEY } = process.env;
 class User {
   async addNewUser(req, res, next) {
     const { email, password, requireVerificationEmail } = req.body;
-    const host = req.headers.host;
 
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
@@ -24,7 +23,7 @@ class User {
 
       const verificationToken = idGeneration();
       if (requireVerificationEmail) {
-        await sendMail(sgMailData(verificationToken, email, host), next);
+        await sendMail(sgMailData(verificationToken, email), next);
       }
 
       const user = await UserModel.create({
