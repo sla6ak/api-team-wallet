@@ -12,7 +12,6 @@ const { JWT_SECRET_KEY } = process.env;
 class User {
   async addNewUser(req, res, next) {
     const { email, password, requireVerificationEmail } = req.body;
-    const host = req.headers.host;
 
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
