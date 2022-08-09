@@ -12,8 +12,7 @@ const { JWT_SECRET_KEY } = process.env;
 class User {
   async addNewUser(req, res, next) {
     const { email, password, requireVerificationEmail } = req.body;
-
-    console.log(`${email}, ${password}, ${requireVerificationEmail}`);
+    const host = req.headers.host;
 
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
@@ -25,8 +24,7 @@ class User {
 
       const verificationToken = idGeneration();
       if (requireVerificationEmail) {
-        const send = await sendMail(sgMailData(verificationToken, email), next);
-        console.log(send);
+        await sendMail(sgMailData(verificationToken, email, host), next);
       }
 
       const user = await UserModel.create({
@@ -35,7 +33,7 @@ class User {
         verificationToken,
       });
 
-      res.status(201).json({ user });
+      res.status(201).json(user);
     } catch (error) {
       next(error);
     }
@@ -137,6 +135,19 @@ class User {
       await sendMail(sgMailData(user.verificationToken, email), next);
 
       res.json({ message: "Verification email sent" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req, res, next) {
+    try {
+      const { email } = req.user;
+      const user = await UserModel.findOneAndDelete({ email });
+      if (!user) {
+        throw createError(404);
+      }
+      return res.json({ user });
     } catch (error) {
       next(error);
     }
