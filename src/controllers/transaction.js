@@ -12,6 +12,7 @@ class Transaction {
       const transactions = await TransactionModel.find({ owner }, "-createdAt -updatedAt");
 
       const data = {
+        currentBalance: user.currentBalance,
         transactions,
       }
 
@@ -46,8 +47,6 @@ class Transaction {
           user._id,
           { currentBalance: balanceAfterTransaction },
           { new: true });
-      // TODO: тут скорей всего нужна проверка что юзер обновился
-      console.log(updatedUser); 
 
       // TODO: проверить есть ли другие транзакции после даты текущей транзакции и изменить в них поле balanceAfterTransaction
 
@@ -60,6 +59,7 @@ class Transaction {
 
       const data = {
         message: "Transaction was created successfully",
+        currentBalance: updatedUser.currentBalance,
         transaction: newTransaction,
       };
 
@@ -77,8 +77,8 @@ class Transaction {
 
       const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
         getStatisticByCategories(transactions);
-
-      const data = [
+      
+      const statistic = [
         {
           type: TRANSACTION_TYPES.INCOME,
           totalIncomeSum
@@ -89,6 +89,11 @@ class Transaction {
           expenseStatistic,
         },
       ];
+      
+      const data = {
+        currentBalance: user.currentBalance,
+        statistic,
+      };
 
       return res.status(200).json(data);
 
@@ -112,7 +117,7 @@ class Transaction {
       const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
         getStatisticByCategories(transactions);
 
-      const data = [
+      const statistic = [
         {
           type: TRANSACTION_TYPES.INCOME,
           totalIncomeSum
@@ -123,6 +128,11 @@ class Transaction {
           expenseStatistic,
         },
       ];
+      
+      const data = {
+        currentBalance: user.currentBalance,
+        statistic,
+      };
 
       return res.status(200).json(data);
     } catch (error) {
@@ -146,7 +156,7 @@ class Transaction {
       const { totalIncomeSum, totalExpenseSum, expenseStatistic } =
         getStatisticByCategories(transactions);
 
-      const data = [
+      const statistic = [
         {
           type: TRANSACTION_TYPES.INCOME,
           totalIncomeSum
@@ -157,6 +167,11 @@ class Transaction {
           expenseStatistic,
         },
       ];
+      
+      const data = {
+        currentBalance: user.currentBalance,
+        statistic,
+      };
 
       return res.status(200).json(data);
     } catch (error) {
