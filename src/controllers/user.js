@@ -24,7 +24,7 @@ class User {
 
       const verificationToken = idGeneration();
       if (requireVerificationEmail) {
-        await sendMail(sgMailData(verificationToken, email, host), next);
+        await sendMail(sgMailData(verificationToken, email), next);
       }
 
       const user = await UserModel.create({
