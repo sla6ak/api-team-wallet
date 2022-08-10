@@ -30,7 +30,7 @@ const schema = new Schema(
 
     requireVerificationEmail: {
       type: Boolean,
-      default: false,
+      default: true,
     },
 
     verify: {

@@ -7,11 +7,11 @@ const { sendMail, sgMailData } = require("../helpers");
 
 const dotenv = require("dotenv");
 dotenv.config();
-const { JWT_SECRET_KEY } = process.env;
+const { JWT_SECRET_KEY, requireVerificationEmail } = process.env;
 
 class User {
   async addNewUser(req, res, next) {
-    const { email, password, requireVerificationEmail } = req.body;
+    const { email, password } = req.body;
 
     try {
       const duplicateEmail = await UserModel.findOne({ email: email });
