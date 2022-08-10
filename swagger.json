@@ -207,10 +207,6 @@
             "description": "Verification has already been passed",
             "content": {}
           },
-          "404": {
-            "description": "User not found",
-            "content": {}
-          },
           "409": {
             "description": "Email not found",
             "content": {}
@@ -250,6 +246,42 @@
           },
           "499": {
             "description": "verificationToken error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/delete": {
+      "delete": {
+        "tags": ["Auth"],
+        "summary": "Delete user",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "verification token"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation delete",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          },
+          "404": {
+            "description": "Not Found",
             "content": {}
           }
         }
@@ -490,65 +522,60 @@
       "RegistrationResponse": {
         "type": "object",
         "properties": {
-          "user": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "User's name",
-                "example": "user name"
-              },
-              "email": {
-                "type": "string",
-                "description": "User's email",
-                "format": "email"
-              },
-              "password": {
-                "type": "string",
-                "description": "User's hash password",
-                "example": "$2b$12$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
-              },
-              "currentBalance": {
-                "type": "number",
-                "description": "User balance",
-                "example": 0
-              },
-              "token": {
-                "type": "string",
-                "description": "User's token",
-                "example": ""
-              },
-              "requireVerificationEmail": {
-                "type": "boolean",
-                "description": "require email verification",
-                "example": false
-              },
-              "verify": {
-                "type": "string",
-                "description": "verify user",
-                "example": false
-              },
-              "verificationToken": {
-                "type": "string",
-                "description": "User's verificationToken",
-                "example": "62e6bc070f48b940eb37efe9"
-              },
-              "_id": {
-                "type": "string",
-                "description": "User's id",
-                "example": "62e6bc075ac15ac3d52c43b7"
-              },
-              "createdAt": {
-                "type": "string",
-                "description": "User's created date",
-                "example": "2022-07-31T17:29:43.672Z"
-              },
-              "updatedAt": {
-                "type": "string",
-                "description": "User's updated date",
-                "example": "2022-07-31T17:29:43.672Z"
-              }
-            }
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "user name"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's hash password",
+            "example": "$2b$12$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
+          },
+          "currentBalance": {
+            "type": "number",
+            "description": "User balance",
+            "example": 0
+          },
+          "token": {
+            "type": "string",
+            "description": "User's token",
+            "example": ""
+          },
+          "requireVerificationEmail": {
+            "type": "boolean",
+            "description": "require email verification",
+            "example": false
+          },
+          "verify": {
+            "type": "string",
+            "description": "verify user",
+            "example": false
+          },
+          "verificationToken": {
+            "type": "string",
+            "description": "User's verificationToken",
+            "example": "62e6bc070f48b940eb37efe9"
+          },
+          "_id": {
+            "type": "string",
+            "description": "User's id",
+            "example": "62e6bc075ac15ac3d52c43b7"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "User's created date",
+            "example": "2022-07-31T17:29:43.672Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "User's updated date",
+            "example": "2022-07-31T17:29:43.672Z"
           }
         }
       },
@@ -739,9 +766,79 @@
           }
         }
       },
+      "DeleteResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "62e6bc075ac15ac3d52c43b7"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "user name"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "description": "User's hash password",
+                "example": "$2b$32$/G9f5CteS4GjtjR/6CRzFeKkqzzn2M7ZeeRGvVcg2EpuROyYCbIX."
+              },
+              "currentBalance": {
+                "type": "number",
+                "description": "User balance",
+                "example": 0
+              },
+              "token": {
+                "type": "string",
+                "description": "User's token",
+                "example": "rJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyZWQ1YmM5ZWYxNDYyYmNhY2YxNjdkMSIsImlhdCI6MTY1OTcyNDQ5OSwiZXhwIjoxNjYyMzE2NDk5fQ.9yigGtO-dmmeqfWNMyUs_JNQhoVdQaKik3ldbKdwzIo"
+              },
+              "requireVerificationEmail": {
+                "type": "boolean",
+                "description": "require email verification",
+                "example": false
+              },
+              "verify": {
+                "type": "string",
+                "description": "verify user",
+                "example": false
+              },
+              "verificationToken": {
+                "type": "string",
+                "description": "User's verificationToken",
+                "example": "62e6bc070f48b940eb37efe9"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User's created date",
+                "example": "2022-07-31T17:29:43.672Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "description": "User's updated date",
+                "example": "2022-07-31T17:29:43.672Z"
+              }
+            }
+          }
+        }
+      },
       "TransactionAllResponse": {
         "type": "object",
         "properties": {
+          "currentBalance": {
+            "type": "string",
+            "description": "User current balance",
+            "example": 16750
+          },
           "transaction": {
             "type": "array",
             "items": {
@@ -810,12 +907,15 @@
             "description": "type transaction",
             "enum": ["income", "expense"]
           },
-          "category": {
+          "income category": {
+            "type": "string",
+            "description": "category transaction",
+            "enum": ["salary", "gift", "other"]
+          },
+          "expense category": {
             "type": "string",
             "description": "category transaction",
             "enum": [
-              "salary",
-              "gift",
               "food",
               "car",
               "children",
@@ -832,24 +932,9 @@
             "example": 17800
           },
           "date": {
-            "type": "object",
-            "properties": {
-              "year": {
-                "type": "number",
-                "description": "year of operation",
-                "example": 2022
-              },
-              "month": {
-                "type": "number",
-                "description": "month of operation",
-                "example": 11
-              },
-              "day": {
-                "type": "number",
-                "description": "day of operation",
-                "example": 12
-              }
-            }
+            "type": "string",
+            "description": "date of operation",
+            "example": "2022.11.12"
           }
         }
       },
@@ -860,6 +945,11 @@
             "type": "string",
             "description": "message about the completed operation",
             "example": "Transaction was created successfully"
+          },
+          "currentBalance": {
+            "type": "string",
+            "description": "User current balance",
+            "example": 17920
           },
           "transaction": {
             "type": "object",
@@ -929,75 +1019,89 @@
         }
       },
       "StatisticResponse": {
-        "type": "array",
-        "income": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "description": "transaction type",
-              "example": "income"
+        "type": "object",
+        "properties": {
+          "currentBalance": {
+            "type": "string",
+            "description": "User current balance",
+            "example": 17920
+          },
+          "statistic": {
+            "type": "array",
+            "income": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "transaction type",
+                  "example": "income"
+                },
+                "totalIncomeSum": {
+                  "type": "number",
+                  "description": "total income",
+                  "example": 22800
+                }
+              }
             },
-            "totalIncomeSum": {
-              "type": "number",
-              "description": "total income",
-              "example": 22800
-            }
-          }
-        },
-        "expense": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "description": "transaction type",
-              "example": "income"
-            },
-            "totalExpenseSum": {
-              "type": "number",
-              "description": "total expanse",
-              "example": 5050
-            },
-            "expenseStatistic": {
-              "type": "array",
-              "item": {
-                "type": "object",
-                "properties": {
-                  "category": {
-                    "type": "string",
-                    "description": "expense category",
-                    "example": "car"
-                  },
-                  "totalSumByCategory": {
-                    "type": "number",
-                    "description": "expense sum",
-                    "example": 1850
+            "expense": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "transaction type",
+                  "example": "expense"
+                },
+                "totalExpenseSum": {
+                  "type": "number",
+                  "description": "total expanse",
+                  "example": 5050
+                },
+                "expenseStatistic": {
+                  "type": "array",
+                  "item": {
+                    "type": "object",
+                    "properties": {
+                      "category": {
+                        "type": "string",
+                        "description": "expense category",
+                        "example": "car"
+                      },
+                      "totalSumByCategory": {
+                        "type": "number",
+                        "description": "expense sum",
+                        "example": 1850
+                      }
+                    }
                   }
                 }
               }
             }
           }
         },
-        "example": [
-          {
-            "type": "income",
-            "totalIncomeSum": 22800
-          },
-          {
-            "type": "expense",
-            "totalExpenseSum": 5050,
-            "expenseStatistic": [
-              {
-                "category": "car",
-                "totalSumByCategory": 1850
-              },
-              {
-                "category": "house",
-                "totalSumByCategory": 3200
-              }
-            ]
-          }
-        ]
+
+        "example": {
+          "currentBalance": 14650,
+          "statistic": [
+            {
+              "type": "income",
+              "totalIncomeSum": 0
+            },
+            {
+              "type": "expense",
+              "totalExpenseSum": 6300,
+              "expenseStatistic": [
+                {
+                  "category": "house",
+                  "totalSumByCategory": 4200
+                },
+                {
+                  "category": "education",
+                  "totalSumByCategory": 2100
+                }
+              ]
+            }
+          ]
+        }
       }
     },
     "securitySchemes": {

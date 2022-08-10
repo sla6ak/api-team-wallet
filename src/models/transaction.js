@@ -19,7 +19,7 @@ const transactionSchema = new Schema({
     type: Number,
     required: [true, "Sum of transaction is required"],
   },
-   date: {
+  date: {
     year: {
       type: Number,
       required: true,
